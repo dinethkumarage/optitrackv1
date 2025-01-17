@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Stock - OptiTrack</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0066FF;
+            --primary-dark: #0052CC;
+            --secondary: #6B7280;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --primary: #60A5FA;
+            --primary-dark: #3B82F6;
+            --gray-50: #111827;
+            --gray-100: #1F2937;
+            --gray-200: #374151;
+            --gray-700: #D1D5DB;
+            --gray-800: #E5E7EB;
+            --gray-900: #F9FAFB;
+            color-scheme: dark;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color var(--transition-speed),
+                        border-color var(--transition-speed),
+                        color var(--transition-speed);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            position: relative;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--gray-100);
+        }
+
+        .theme-toggle .sun,
+        .theme-toggle .moon {
+            position: absolute;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .theme-toggle .sun {
+            color: #F59E0B;
+            transform: scale(1) rotate(0);
+        }
+
+        .theme-toggle .moon {
+            color: #60A5FA;
+            transform: scale(0) rotate(-90deg);
+        }
+
+        [data-theme="dark"] .theme-toggle .sun {
+            transform: scale(0) rotate(90deg);
+        }
+
+        [data-theme="dark"] .theme-toggle .moon {
+            transform: scale(1) rotate(0);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            color: var(--gray-800);
+            border: 1px solid var(--gray-200);
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .back-button:hover {
+            background: var(--gray-200);
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-select,
+        .form-input {
+            padding: 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.375rem;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            width: 100%;
+        }
+
+        .add-button {
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .add-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .table-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--gray-200);
+            overflow-x: auto;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .items-table th {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .delete-btn {
+            padding: 0.25rem 0.5rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .footer {
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            margin-top: auto;
+        }
+
+        [data-theme="dark"] .header,
+        [data-theme="dark"] .form-section,
+        [data-theme="dark"] .table-section,
+        [data-theme="dark"] .footer {
+            background-color: #1a1a1a;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-section">
+            <a href="#" class="logo">OptiTrack</a>
+        </div>
+        <div class="nav-actions">
+            
+        </div>
+    </header>
+
+    <main class="main-content">
+        <a href="index.html" class="back-button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Back to Dashboard
+        </a>
+
+        <div class="form-section">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="category">
+                        <option value="">Select Category</option>
+                        <option value="fresh-produce">Fresh Produce</option>
+                        <option value="dairy">Dairy Products</option>
+                        <option value="meat">Meat & Seafood</option>
+                        <option value="bakery">Bakery</option>
+                        <option value="beverages">Beverages</option>
+                        <option value="frozen">Frozen Foods</option>
+                        <option value="pantry">Pantry Staples</option>
+                        <option value="snacks">Snacks & Confectionery</option>
+                        <option value="household">Household Supplies</option>
+                        <option value="health">Health & Beauty</option>
+                        <option value="baby">Baby Products</option>
+                        <option value="pet">Pet Supplies</option>
+                        <option value="international">International Foods</option>
+                        <option value="canned">Canned & Packaged Goods</option>
+                        <option value="alcohol">Alcoholic Beverages</option>
+                        <option value="cleaning">Cleaning Supplies</option>
+                        <option value="paper">Paper Products</option>
+                        <option value="personal">Personal Care</option>
+                        <option value="organic">Organic & Specialty Foods</option>
+                        <option value="pharmacy">Pharmacy & OTC Medicine</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Item Name</label>
+                    <input type="text" class="form-input" id="itemName" placeholder="Enter item name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price</label>
+                    <input type="number" class="form-input" id="price" placeholder="Enter price" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Currency</label>
+                    <select class="form-select" id="currency">
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="JPY">JPY - Japanese Yen</option>
+                        <option value="CNY">CNY - Chinese Yuan</option>
+                        <option value="CAD">CAD - Canadian Dollar</option>
+                        <option value="AUD">AUD - Australian Dollar</option>
+                    </select>
+                </div>
+            </div>
+            <button class="add-button" onclick="addItem()">Add Item</button>
+        </div>
+
+        <div class="table-section">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Item Name</th>
+                        <th>Price</th>
+                        <th>Currency</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div>© 2025 OptiTrack. All rights reserved.</div>
+        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--gray-600);">Computerized Solutions | Cometco.llc</div>
+    </footer>
+
+    <script>
+        // Theme management
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('optitrack-theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+                updateThemeIcon(savedTheme === 'dark');
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('optitrack-theme', 'dark');
+                updateThemeIcon(true);
+            }
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!localStorage.getItem('optitrack-theme')) {
+                    const newTheme = e.matches ? 'dark' : 'light';
+                    document.body.setAttribute('data-theme', newTheme);
+                    updateThemeIcon(e.matches);
+                }
+            });
+        });
+
+        function updateThemeIcon(isDark) {
+            const sunIcon = document.querySelector('.theme-toggle .sun');
+            const moonIcon = document.querySelector('.theme-toggle .moon');
+            
+            if (isDif (isDark)) {
+                sunIcon.style.transform = 'scale(0) rotate(90deg)';
+                moonIcon.style.transform = 'scale(1) rotate(0)';
+            } else {
+                sunIcon.style.transform = 'scale(1) rotate(0)';
+                moonIcon.style.transform = 'scale(0) rotate(-90deg)';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            
+            if (isDark) {
+                body.removeAttribute('data-theme');
+                localStorage.setItem('optitrack-theme', 'light');
+                updateThemeIcon(false);
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                localStorage.setItem('optitrack-theme', 'dark');
+                updateThemeIcon(true);
+            }
+        }
+
+        // Item management
+        let items = [];
+
+        function addItem() {
+            const category = document.getElementById('category');
+            const itemName = document.getElementById('itemName');
+            const price = document.getElementById('price');
+            const currency = document.getElementById('currency');
+
+            // Validation
+            if (!category.value || !itemName.value || !price.value || !currency.value) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const item = {
+                id: Date.now(),
+                category: category.options[category.selectedIndex].text,
+                name: itemName.value,
+                price: parseFloat(price.value),
+                currency: currency.value
+            };
+
+            items.push(item);
+            updateTable();
+            resetForm();
+        }
+
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            updateTable();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('itemsTableBody');
+            tbody.innerHTML = '';
+
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.category}</td>
+                    <td>${item.name}</td>
+                    <td>${item.price.toFixed(2)}</td>
+                    <td>${item.currency}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteItem(${item.id})">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('category').value = '';
+            document.getElementById('itemName').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('currency').value = 'USD';
+        }
+    </script>
+</body>
+</html>
